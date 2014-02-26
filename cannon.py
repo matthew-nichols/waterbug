@@ -17,7 +17,6 @@ class Cannon(objects.Thing):
 	def update(self):
 		self.launch -= constants.dt
 		if (self.launch < 0):
-			print "launch"
 			if hasattr(self, 'ball'): self.ball.destruct(); del self.ball
 			self.launch = 10
 			#self.ball = objects.Ball(self.pos, 0.1)

@@ -46,12 +46,10 @@ class ODEThing(Thing):
 		self.body.data = weakref.ref(self)
 	def draw(self):
 		if not hasattr(self, 'geom'):
-			#print "how?"
 			return
 		render.drawGeom(self.geom)
 	def update(self):
 		if not hasattr(self, 'geom'):
-			#print "why?"
 			return
 		r, _, _, z = self.body.getQuaternion()
 		quat_len = math.sqrt(r * r + z * z)
@@ -61,7 +59,6 @@ class ODEThing(Thing):
 		self.body.setAngularVel((0,0,v))
 	def destroy(self):
 		if not hasattr(self, 'geom'):
-			#print "what?"
 			return
 		self.geom.getSpace().remove(self.geom)
 		del self.geom; del self.joint; del self.body
