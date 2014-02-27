@@ -100,7 +100,7 @@ class Capsule(ODEThing):
 		self.body.setPosition((x,y,0))
 		self.geom = ode.GeomTransform(space)
 		self.geom2 = ode.GeomCapsule(None, radius, length)
-		self.geom2.setRotation((0,0,1,0,-1,0,1,0,0))
+		self.geom2.setRotation((0,0,1,1,0,0,0,1,0)) # make z point into x
 		self.geom.setBody(self.body)
 		self.geom.setGeom(self.geom2)
 		ODEThing.__init__(self)
