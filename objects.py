@@ -45,12 +45,8 @@ class ODEThing(Thing):
 		self.joint.attach(self.body, ode.environment)
 		self.body.data = weakref.ref(self)
 	def draw(self):
-		if not hasattr(self, 'geom'):
-			return
 		render.drawGeom(self.geom)
 	def update(self):
-		if not hasattr(self, 'geom'):
-			return
 		r, _, _, z = self.body.getQuaternion()
 		quat_len = math.sqrt(r * r + z * z)
 		r /= quat_len; z /= quat_len;
@@ -58,8 +54,6 @@ class ODEThing(Thing):
 		_, _, v = self.body.getAngularVel()
 		self.body.setAngularVel((0,0,v))
 	def destroy(self):
-		if not hasattr(self, 'geom'):
-			return
 		self.geom.getSpace().remove(self.geom)
 		del self.geom; del self.joint; del self.body
 	
@@ -93,3 +87,26 @@ class Ball(ODEThing):
 		self.geom = ode.GeomSphere(space, rad)
 		self.geom.setBody(self.body)
 		ODEThing.__init__(self)
+
+class Capsule(ODEThing):
+	def __init__(self, pos=(0,0), radius=1, length=1, mass=1):
+		self.radius = radius
+		self.length = length
+		x, y = pos
+		self.body = ode.Body(world)
+		M = ode.Mass()
+		M.setCappedCylinderTotal(mass, 1, radius, length)
+		self.body.setMass(M)
+		self.body.setPosition((x,y,0))
+		self.geom = ode.GeomTransform(space)
+		self.geom2 = ode.GeomCapsule(None, radius, length)
+		self.geom2.setRotation((0,0,1,0,-1,0,1,0,0))
+		self.geom.setBody(self.body)
+		self.geom.setGeom(self.geom2)
+		ODEThing.__init__(self)
+	
+	def draw(self):
+		x, y, _ = self.body.getPosition()
+		rot = self.body.getRotation()
+		render.drawCapsule((x,y), self.length, 2*self.radius, rot[0], rot[1])
+		

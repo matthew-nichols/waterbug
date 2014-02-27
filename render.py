@@ -48,12 +48,29 @@ def drawGeom(geom):
 		draw.circle(screen, blue, (int(px), int(py)), int(pr), 1)
 		drawLine((x,y), (x + costheta * r, y - sintheta * r))
 	elif type(geom) is ode.GeomCapsule:
+		x, y, _ = geom.getPosition()
 		pass
 	elif isinstance(geom, ode.SpaceBase):
 		for i in geom:
 			drawGeom(i)
 	else:
 		assert False
+
+def drawCapsule(pos, a, b, costheta, sintheta):
+	x, y = pos
+	p1 = to_screen_pnt(x + a/2 * costheta + b/2 * sintheta, y - a/2 * sintheta + b/2 * costheta)
+	p2 = to_screen_pnt(x + a/2 * costheta - b/2 * sintheta, y - a/2 * sintheta - b/2 * costheta)
+	p3 = to_screen_pnt(x - a/2 * costheta - b/2 * sintheta, y + a/2 * sintheta - b/2 * costheta)
+	p4 = to_screen_pnt(x - a/2 * costheta + b/2 * sintheta, y + a/2 * sintheta + b/2 * costheta)
+	draw.lines(screen, blue, True, [p1, p2, p3, p4])
+	drawCircle((x + a/2 * costheta, y - a/2 * sintheta), b/2)
+	drawCircle((x - a/2 * costheta, y + a/2 * sintheta), b/2)
+
+def drawCircle(pos, rad):
+	x, y = pos
+	x, y = to_screen_pnt(x, y)
+	rad = to_screen_len(rad)
+	draw.circle(screen, blue, (int(x), int(y)), int(rad), 1)
 
 def drawLine(p1, p2, color = blue):
 	x = p1[0]; y = p1[1]

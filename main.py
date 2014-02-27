@@ -45,10 +45,11 @@ def near_callback(args, g1, g2):
 sim_time = pygame.time.get_ticks() / 1000.0
 		
 box = objects.Ball((0.5,0.5),0.1)
-objects.Box((0.7,0.5),(0.2,0.2))
-objects.Box((0.3,0.5),(0.3,0.3))
-objects.Ball((1.3,1.3),0.2)
-cannon.Cannon((3.5,3.5),(1,0.2))
+#objects.Box((0.7,0.5),(0.2,0.2))
+#objects.Box((0.3,0.5),(0.3,0.3))
+#objects.Ball((1.3,1.3),0.2)
+#cannon.Cannon((3.5,3.5),(1,0.2))
+objects.Capsule((1.7,1.7),0.1,0.4)
 
 while running:
 	e = event.poll()
