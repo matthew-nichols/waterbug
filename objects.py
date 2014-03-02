@@ -63,6 +63,9 @@ class ODEThing(Thing):
 	
 	def addTorque(self, torque):
 		self.body.addTorque((0,0,torque))
+	
+	def setRotation(radians):
+		self.body.setRotation((math.cos(radians), math.sin(radians), 0, -math.sin(radians), math.cos(radians), 0, 0, 0, 1))
 		
 class Box(ODEThing):
 	def __init__(self, pos=(0,0), lengths=(1,1), mass=1):
@@ -89,6 +92,7 @@ class Ball(ODEThing):
 		ODEThing.__init__(self)
 
 class Capsule(ODEThing):
+	""" makes a capsule, pointing into x by default """
 	def __init__(self, pos=(0,0), radius=1, length=1, mass=1):
 		self.radius = radius
 		self.length = length
