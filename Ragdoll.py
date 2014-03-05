@@ -4,6 +4,98 @@ import objects
 
 import ode
 
+def sign(x):
+    """Returns 1.0 if x is positive, -1.0 if x is negative or zero."""
+    if x > 0.0: return 1.0
+    else: return -1.0
+
+def len3(v):
+    """Returns the length of 3-vector v."""
+    return sqrt(v[0]**2 + v[1]**2 + v[2]**2)
+
+def neg3(v):
+    """Returns the negation of 3-vector v."""
+    return (-v[0], -v[1], -v[2])
+
+def add3(a, b):
+    """Returns the sum of 3-vectors a and b."""
+    return (a[0] + b[0], a[1] + b[1], a[2] + b[2])
+
+def sub3(a, b):
+    """Returns the difference between 3-vectors a and b."""
+    return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+def mul3(v, s):
+    """Returns 3-vector v multiplied by scalar s."""
+    return (v[0] * s, v[1] * s, v[2] * s)
+
+def div3(v, s):
+    """Returns 3-vector v divided by scalar s."""
+    return (v[0] / s, v[1] / s, v[2] / s)
+
+def dist3(a, b):
+    """Returns the distance between point 3-vectors a and b."""
+    return len3(sub3(a, b))
+
+def norm3(v):
+    """Returns the unit length 3-vector parallel to 3-vector v."""
+    l = len3(v)
+    if (l > 0.0): return (v[0] / l, v[1] / l, v[2] / l)
+    else: return (0.0, 0.0, 0.0)
+
+def dot3(a, b):
+    """Returns the dot product of 3-vectors a and b."""
+    return (a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
+
+def cross(a, b):
+    """Returns the cross product of 3-vectors a and b."""
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0])
+
+def project3(v, d):
+    """Returns projection of 3-vector v onto unit 3-vector d."""
+    return mul3(v, dot3(norm3(v), d))
+
+def acosdot3(a, b):
+    """Returns the angle between unit 3-vectors a and b."""
+    x = dot3(a, b)
+    if x < -1.0: return pi
+    elif x > 1.0: return 0.0
+    else: return acos(x)
+
+def rotate3(m, v):
+    """Returns the rotation of 3-vector v by 3x3 (row major) matrix m."""
+    return (v[0] * m[0] + v[1] * m[1] + v[2] * m[2],
+        v[0] * m[3] + v[1] * m[4] + v[2] * m[5],
+        v[0] * m[6] + v[1] * m[7] + v[2] * m[8])
+
+def invert3x3(m):
+    """Returns the inversion (transpose) of 3x3 rotation matrix m."""
+    return (m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8])
+
+def zaxis(m):
+    """Returns the z-axis vector from 3x3 (row major) rotation matrix m."""
+    return (m[2], m[5], m[8])
+
+def calcRotMatrix(axis, angle):
+    """
+    Returns the row-major 3x3 rotation matrix defining a rotation around axis by
+    angle.
+    """
+    cosTheta = cos(angle)
+    sinTheta = sin(angle)
+    t = 1.0 - cosTheta
+    return (
+        t * axis[0]**2 + cosTheta,
+        t * axis[0] * axis[1] - sinTheta * axis[2],
+        t * axis[0] * axis[2] + sinTheta * axis[1],
+        t * axis[0] * axis[1] + sinTheta * axis[2],
+        t * axis[1]**2 + cosTheta,
+        t * axis[1] * axis[2] - sinTheta * axis[0],
+        t * axis[0] * axis[2] - sinTheta * axis[1],
+        t * axis[1] * axis[2] + sinTheta * axis[0],
+        t * axis[2]**2 + cosTheta)
+
 class RagDoll(objects.Thing):
     def __init__(self, world, space, density, offset = (0.0, 0.0, 0.0)):
         """Creates a ragdoll of standard size at the given offset."""
@@ -85,4 +177,62 @@ class RagDoll(objects.Thing):
     def applyTorque(self, angle, angVel, wantedAngle, f, b, segment):
         torque = f*(wantedAngle-angle)+b*(0 - angVel[0])
         ragdoll.segment.addTorque([torque, 0, 0])
+    
+    def update(ragdoll):
+        angle2 = ragdoll.joint2.getAngle()
+        angle3 = ragdoll.joint3.getAngle()
+        angularVelocity2 = ragdoll.joint2.getAngleRate()
+        angularVelocity3 = ragdoll.joint3.getAngleRate()
+        d = 7
+        torque2 = 50*(ragdoll.wantedAngle2 - angle2) + d*(0 - angularVelocity2)
+        torque3 = 50*(ragdoll.wantedAngle3 - angle3) + d*(0 - angularVelocity3)
+        ragdoll.segment2.addTorque([0, torque2, 0])
+        ragdoll.segment3.addTorque([0, torque3, 0])
+
+        angle4 = ragdoll.joint4.getAngle()
+        angle5 = ragdoll.joint5.getAngle()
+        angularVelocity4 = ragdoll.joint4.getAngleRate()
+        angularVelocity5 = ragdoll.joint5.getAngleRate()
+        torque4 = 50*(ragdoll.wantedAngle4 - angle4) + d*(0 - angularVelocity4)
+        torque5 = 50*(ragdoll.wantedAngle5 - angle5) + d*(0 - angularVelocity5)
+        ragdoll.segment4.addTorque([0, torque4, 0])
+        ragdoll.segment5.addTorque([0, torque5, 0])
+
+        angle6 = ragdoll.joint6.getAngle()
+        angle7 = ragdoll.joint7.getAngle()
+        angularVelocity6 = ragdoll.joint6.getAngleRate()
+        angularVelocity7 = ragdoll.joint7.getAngleRate()
+        torque6 = 50*(ragdoll.wantedAngle6 - angle6) + d*(0 - angularVelocity6)
+        torque7 = 50*(ragdoll.wantedAngle7 - angle7) + d*(0 - angularVelocity7)
+        ragdoll.segment6.addTorque([0, torque6, 0])
+        ragdoll.segment7.addTorque([0, torque7, 0])
+
+        angle8 = ragdoll.joint8.getAngle()
+        angle9 = ragdoll.joint9.getAngle()
+        angularVelocity8 = ragdoll.joint8.getAngleRate()
+        angularVelocity9 = ragdoll.joint9.getAngleRate()
+        torque8 = 50*(ragdoll.wantedAngle8 - angle8) + d*(0 - angularVelocity8)
+        torque9 = 50*(ragdoll.wantedAngle9 - angle9) + d*(0 - angularVelocity9) 
+        ragdoll.segment8.addTorque([0, torque8, 0])
+        ragdoll.segment9.addTorque([0, torque9, 0])
+    
+    def setWantedPosition(ragdoll, pos):
+        if pos == 0:
+            ragdoll.wantedAngle2 = 0
+            ragdoll.wantedAngle3 = 0
+            ragdoll.wantedAngle4 = 0
+            ragdoll.wantedAngle5 = 0
+            ragdoll.wantedAngle6 = 0
+            ragdoll.wantedAngle7 = 0
+            ragdoll.wantedAngle8 = 0
+            ragdoll.wantedAngle9 = 0
+        else:
+            ragdoll.wantedAngle2 = pi/2
+            ragdoll.wantedAngle3 = -pi/2
+            ragdoll.wantedAngle4 = -pi/2
+            ragdoll.wantedAngle5 = pi/2
+            ragdoll.wantedAngle6 = -pi/2
+            ragdoll.wantedAngle7 = pi/2
+            ragdoll.wantedAngle8 = pi/2
+            ragdoll.wantedAngle9 = -pi/2
 

@@ -94,13 +94,29 @@ class ODEThing(Thing):
 		self.body.addForce((x,y,0))
 	
 	def addTorque(self, torque):
-		self.body.addTorque((0,0,torque))
+		if type(torque) is float:
+			self.body.addTorque((0,0,torque))
+		else:
+			self.body.addTorque((0,0,torque[1]))
 	
 	def setRotation(self, radians):
 		self.body.setRotation((math.cos(radians), math.sin(radians), 0, -math.sin(radians), math.cos(radians), 0, 0, 0, 1))
 	
 	def getMass(self):
 		self.body.getMass()
+	
+	def getAngularVel(self):
+		# TODO: return 2d angular velocity, Ragdoll.py needs 3D for now
+		return self.body.getAngularVel()
+	
+	def setAngularVel(self, pos):
+		# TODO: same
+		x, _, y = pos
+		self.body.setAngularVel((x, y, 0))
+	
+	def getPosition(self):
+		# TODO: same
+		return self.body.getPosition()
 		
 class Box(ODEThing):
 	def __init__(self, pos=(0,0), lengths=(1,1), mass=1):
