@@ -1,6 +1,7 @@
 import math
 from math import *
 import objects
+import render
 
 import ode
 
@@ -97,18 +98,19 @@ def calcRotMatrix(axis, angle):
         t * axis[2]**2 + cosTheta)
 
 class RagDoll(objects.Thing):
-    def __init__(self, world, space, density, offset = (0.0, 0.0, 0.0)):
+    def __init__(self, world, space, density, scale = 1, offset = (0.0, 0.0)):
         """Creates a ragdoll of standard size at the given offset."""
         self.i = 0
         self.world = world
         self.space = space
-        self.density = density
+        #self.density = density
         self.bodies = []
         self.geoms = []
         self.joints = []
         self.totalMass = 0.0
 
-        self.offset = offset
+        self.offsetx, self.offsety = offset
+        self.scale = scale
         self.bodies2 = []
         self.geoms2 = []
 
@@ -151,7 +153,12 @@ class RagDoll(objects.Thing):
 
     def customBody(self, p1, p2, radius):
         p1_x, _, p1_y = p1
-        p2_x, _, p2_y = p2        
+        p2_x, _, p2_y = p2
+        p1_x = p1_x * self.scale + self.offsetx
+        p1_y = p1_y * self.scale + self.offsety
+        p2_x = p2_x * self.scale + self.offsetx
+        p2_y = p2_y * self.scale + self.offsety
+        radius *= self.scale
         body = objects.Capsule( ( (p1_x + p2_x)/2, (p1_y + p2_y)/2 ), radius, math.sqrt( (p1_x - p2_x)**2 + (p1_y - p2_y)**2 ), 1, math.atan2(p2_y - p1_y, p2_x - p1_x))
         objects.construct_now(body)
         self.totalMass += 1
@@ -161,6 +168,7 @@ class RagDoll(objects.Thing):
         self.joint = ode.HingeJoint(self.world)
         self.joint.attach(seg1.body, seg2.body)
         x, _, y = anchor
+        x = x * self.scale + self.offsetx; y = y * self.scale + self.offsety
         self.joint.setAnchor((x,y,0))
         self.joint.setAxis((0, 0, 1))
         self.joints.append(self.joint)
@@ -173,19 +181,18 @@ class RagDoll(objects.Thing):
         self.joint.setAnchor(anchor)
         self.joints.append(self.joint)
         return self.joint
-
-    def applyTorque(self, angle, angVel, wantedAngle, f, b, segment):
-        torque = f*(wantedAngle-angle)+b*(0 - angVel[0])
-        ragdoll.segment.addTorque([torque, 0, 0])
+    
+    def addTorque(self, torque):
+        self.segment10.addTorque(torque)
     
     def update(ragdoll):
         angle2 = ragdoll.joint2.getAngle()
         angle3 = ragdoll.joint3.getAngle()
         angularVelocity2 = ragdoll.joint2.getAngleRate()
         angularVelocity3 = ragdoll.joint3.getAngleRate()
-        d = 7
-        torque2 = 50*(ragdoll.wantedAngle2 - angle2) + d*(0 - angularVelocity2)
-        torque3 = 50*(ragdoll.wantedAngle3 - angle3) + d*(0 - angularVelocity3)
+        d = 0.3; u = 0.9 # TODO: make these dependant on self.scale, somehow
+        torque2 = u*(ragdoll.wantedAngle2 - angle2) + d*(0 - angularVelocity2)
+        torque3 = u*(ragdoll.wantedAngle3 - angle3) + d*(0 - angularVelocity3)
         ragdoll.segment2.addTorque([0, torque2, 0])
         ragdoll.segment3.addTorque([0, torque3, 0])
 
@@ -193,8 +200,8 @@ class RagDoll(objects.Thing):
         angle5 = ragdoll.joint5.getAngle()
         angularVelocity4 = ragdoll.joint4.getAngleRate()
         angularVelocity5 = ragdoll.joint5.getAngleRate()
-        torque4 = 50*(ragdoll.wantedAngle4 - angle4) + d*(0 - angularVelocity4)
-        torque5 = 50*(ragdoll.wantedAngle5 - angle5) + d*(0 - angularVelocity5)
+        torque4 = u*(ragdoll.wantedAngle4 - angle4) + d*(0 - angularVelocity4)
+        torque5 = u*(ragdoll.wantedAngle5 - angle5) + d*(0 - angularVelocity5)
         ragdoll.segment4.addTorque([0, torque4, 0])
         ragdoll.segment5.addTorque([0, torque5, 0])
 
@@ -202,8 +209,8 @@ class RagDoll(objects.Thing):
         angle7 = ragdoll.joint7.getAngle()
         angularVelocity6 = ragdoll.joint6.getAngleRate()
         angularVelocity7 = ragdoll.joint7.getAngleRate()
-        torque6 = 50*(ragdoll.wantedAngle6 - angle6) + d*(0 - angularVelocity6)
-        torque7 = 50*(ragdoll.wantedAngle7 - angle7) + d*(0 - angularVelocity7)
+        torque6 = u*(ragdoll.wantedAngle6 - angle6) + d*(0 - angularVelocity6)
+        torque7 = u*(ragdoll.wantedAngle7 - angle7) + d*(0 - angularVelocity7)
         ragdoll.segment6.addTorque([0, torque6, 0])
         ragdoll.segment7.addTorque([0, torque7, 0])
 
@@ -211,10 +218,14 @@ class RagDoll(objects.Thing):
         angle9 = ragdoll.joint9.getAngle()
         angularVelocity8 = ragdoll.joint8.getAngleRate()
         angularVelocity9 = ragdoll.joint9.getAngleRate()
-        torque8 = 50*(ragdoll.wantedAngle8 - angle8) + d*(0 - angularVelocity8)
-        torque9 = 50*(ragdoll.wantedAngle9 - angle9) + d*(0 - angularVelocity9) 
+        torque8 = u*(ragdoll.wantedAngle8 - angle8) + d*(0 - angularVelocity8)
+        torque9 = u*(ragdoll.wantedAngle9 - angle9) + d*(0 - angularVelocity9) 
         ragdoll.segment8.addTorque([0, torque8, 0])
         ragdoll.segment9.addTorque([0, torque9, 0])
+    
+    def draw(self):
+        for i in self.joints:
+            render.drawPoint(i.getAnchor(), render.green)
     
     def setWantedPosition(ragdoll, pos):
         if pos == 0:

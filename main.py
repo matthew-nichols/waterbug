@@ -19,11 +19,11 @@ import cannon
 import Ragdoll
 
 running = 1
-#the_maze = maze.Maze(4,4)
-#the_maze.generate_simple2()
-#maze_space = ode.HashSpace(objects.space)
-#maze_space.isImmovable = True
-#the_maze.make_geoms(maze_space)
+the_maze = maze.Maze(4,4)
+the_maze.generate_simple2()
+maze_space = ode.HashSpace(objects.space)
+maze_space.isImmovable = True
+the_maze.make_geoms(maze_space)
 
 ball_width = 0.05
 
@@ -46,7 +46,7 @@ def near_callback(args, g1, g2):
 	# TODO: if d1 and/or d2 are not None, use them to handle collision
 	for c in contacts:
 		c.setBounce(0.8)
-		c.setMu(50)
+		c.setMu(25)
 		objects.DebugPoint(c.getContactGeomParams()[0])
 		j = ode.ContactJoint(objects.world, objects.contactgroup, c)
 		j.attach(g1.getBody(), g2.getBody())
@@ -55,13 +55,15 @@ sim_time = pygame.time.get_ticks() / 1000.0
 		
 #box = objects.Capsule((0.5,0.5),0.04, 0.4)
 #box = objects.Box((0.5,0.5),(0.4,0.4))
-box = objects.Ball((-1, 0),0.1)
+box = objects.Ball((2.5, 0.5),0.1)
 #objects.Box((0.7,0.5),(0.2,0.2))
 #objects.Box((0.3,0.5),(0.3,0.3))
 #objects.Ball((1.3,1.3),0.2)
 #cannon.Cannon((3.5,3.5),(1,0.2))
 objects.Capsule((1.7,1.7),0.04,0.4)
-ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1)
+ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3, 0.5))
+objects.construct_now(ragdoll)
+ragdoll.addTorque(10)
 
 while running:
 	e = event.poll()
@@ -78,10 +80,6 @@ while running:
 			box.addForce((-100,0))
 		elif e.key == pygame.K_RIGHT:
 			box.addForce((100,0))
-		elif e.key == pygame.K_e:
-			geom3.disable()
-		elif e.key == pygame.K_r:
-			geom3.enable()
 		elif e.key == pygame.K_w:
 			box.addTorque(1)
 		elif e.key == pygame.K_e:
@@ -105,11 +103,13 @@ while running:
 	display.flip()
 	
 	now_time = pygame.time.get_ticks() / 1000.0
-	while sim_time + 5*constants.dt <= now_time:
-		sim_time += 5*constants.dt
+	slowness = 1
+	while sim_time + slowness * constants.dt <= now_time:
+		sim_time += slowness * constants.dt
 		objects.update_obj_list()
 		objects.space.collide(None, near_callback)
-		objects.world.quickStep(constants.dt)
+		#objects.world.quickStep(constants.dt)
+		objects.world.step(constants.dt)
 		objects.contactgroup.empty()
 		for i in objects.obj_list:
 			i.update()

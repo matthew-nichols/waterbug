@@ -17,10 +17,10 @@ red = Color(255,0,0)
 green = Color(0,255,0)
 blue = Color(0,0,255)
 
-the_denom = 8
+the_denom = 5
 # automate these and make them less ridiculous
 def to_screen_pnt(x, y):
-	return (x*WIDTH/the_denom+300, y*HEIGHT/the_denom+300)
+	return (x*WIDTH/the_denom+50, y*HEIGHT/the_denom+50)
 def to_screen_vec(x, y):
 	return (x*WIDTH/the_denom, y*HEIGHT/the_denom)
 def to_screen_len(r):

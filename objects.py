@@ -94,7 +94,7 @@ class ODEThing(Thing):
 		self.body.addForce((x,y,0))
 	
 	def addTorque(self, torque):
-		if type(torque) is float:
+		if type(torque) in [float,int]:
 			self.body.addTorque((0,0,torque))
 		else:
 			self.body.addTorque((0,0,torque[1]))
