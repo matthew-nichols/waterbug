@@ -29,6 +29,11 @@ def update_obj_list():
 		obj_list.append(i)
 	create_list = []
 
+def construct_now(obj):
+	obj.construct()
+	create_list.remove(obj)
+	obj_list.append(obj)
+
 class Thing:
 	def __init__(self):
 		"""initializes the object. DO NOT ADD GEOMS/BODIES TO SPACES HERE!"""
@@ -79,7 +84,7 @@ class ODEThing(Thing):
 		_, _, v = self.body.getAngularVel()
 		self.body.setAngularVel((0,0,v))
 		x, y, z = self.body.getPosition()
-		if (abs(z) > 0.01): print "what?"
+		#if (abs(z) > 0.01): print "what?"
 	def destroy(self):
 		self.geom.getSpace().remove(self.geom)
 		del self.geom; del self.joint; del self.body
@@ -91,8 +96,11 @@ class ODEThing(Thing):
 	def addTorque(self, torque):
 		self.body.addTorque((0,0,torque))
 	
-	def setRotation(radians):
+	def setRotation(self, radians):
 		self.body.setRotation((math.cos(radians), math.sin(radians), 0, -math.sin(radians), math.cos(radians), 0, 0, 0, 1))
+	
+	def getMass(self):
+		self.body.getMass()
 		
 class Box(ODEThing):
 	def __init__(self, pos=(0,0), lengths=(1,1), mass=1):
@@ -127,10 +135,10 @@ class Ball(ODEThing):
 
 class Capsule(ODEThing):
 	""" makes a capsule, pointing into x by default """
-	def __init__(self, pos=(0,0), radius=1, length=1, mass=1):
+	def __init__(self, pos=(0,0), radius=1, length=1, mass=1, start_angle=0):
 		self.radius = radius
 		self.length = length
-		self.x, self.y = pos; self.mass = mass
+		self.x, self.y = pos; self.mass = mass; self.start_angle = start_angle
 		ODEThing.__init__(self)
 		
 	def construct(self):
@@ -139,8 +147,9 @@ class Capsule(ODEThing):
 		M.setCappedCylinderTotal(self.mass, 1, self.radius, self.length)
 		self.body.setMass(M)
 		self.body.setPosition((self.x,self.y,0))
+		self.setRotation(self.start_angle)
 		self.geom = ode.GeomTransform(space)
-		self.geom2 = ode.GeomCapsule(None, self.radius, self.length)
+		self.geom2 = ode.GeomCapsule(None, self.radius, self.length) # by default points into z
 		self.geom2.setRotation((0,0,1,1,0,0,0,1,0)) # make z point into x
 		self.geom.setBody(self.body)
 		self.geom.setGeom(self.geom2)

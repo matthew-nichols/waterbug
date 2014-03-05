@@ -19,11 +19,11 @@ import cannon
 import Ragdoll
 
 running = 1
-the_maze = maze.Maze(4,4)
-the_maze.generate_simple2()
-maze_space = ode.HashSpace(objects.space)
-maze_space.isImmovable = True
-the_maze.make_geoms(maze_space)
+#the_maze = maze.Maze(4,4)
+#the_maze.generate_simple2()
+#maze_space = ode.HashSpace(objects.space)
+#maze_space.isImmovable = True
+#the_maze.make_geoms(maze_space)
 
 ball_width = 0.05
 
@@ -37,6 +37,9 @@ def near_callback(args, g1, g2):
 	contacts = ode.collide(g1, g2)
 	#if getattr(g1, 'isImmovable', False) and getattr(g2, 'isImmovable', False):
 	#	return
+	
+	if ode.areConnected(g1.getBody(), g2.getBody()):
+		return
 	
 	d1 = getattr(g1, 'data', None)
 	d2 = getattr(g2, 'data', None)
@@ -58,6 +61,7 @@ box = objects.Ball((0.5,0.5),0.1)
 #objects.Ball((1.3,1.3),0.2)
 #cannon.Cannon((3.5,3.5),(1,0.2))
 objects.Capsule((1.7,1.7),0.04,0.4)
+ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1, (2, 2, 0))
 
 while running:
 	e = event.poll()
