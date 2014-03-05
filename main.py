@@ -16,34 +16,42 @@ import maze
 import objects
 import constants
 import cannon
+import Ragdoll
 
 running = 1
-
 the_maze = maze.Maze(4,4)
 the_maze.generate_simple2()
-the_maze.make_geoms(objects.space)
+maze_space = ode.HashSpace(objects.space)
+maze_space.isImmovable = True
+the_maze.make_geoms(maze_space)
 
 ball_width = 0.05
 
 def near_callback(args, g1, g2):
 	if g1.isSpace() or g2.isSpace():
-		if g1.isSpace():
+		if g1.isSpace() and not getattr(g1, 'isImmovable', False):
 			g1.collide(args, near_callback)
-		if g2.isSpace():
+		if g2.isSpace() and not getattr(g2, 'isImmovable', False):
 			g2.collide(args, near_callback)
 		ode.collide2(g1, g2, args, near_callback)
 	contacts = ode.collide(g1, g2)
+	#if getattr(g1, 'isImmovable', False) and getattr(g2, 'isImmovable', False):
+	#	return
+	
 	d1 = getattr(g1, 'data', None)
 	d2 = getattr(g2, 'data', None)
 	# TODO: if d1 and/or d2 are not None, use them to handle collision
 	for c in contacts:
 		c.setBounce(0.8)
 		c.setMu(50)
+		objects.DebugPoint(c.getContactGeomParams()[0])
 		j = ode.ContactJoint(objects.world, objects.contactgroup, c)
 		j.attach(g1.getBody(), g2.getBody())
 
 sim_time = pygame.time.get_ticks() / 1000.0
 		
+#box = objects.Capsule((0.5,0.5),0.04, 0.4)
+#box = objects.Box((0.5,0.5),(0.4,0.4))
 box = objects.Ball((0.5,0.5),0.1)
 #objects.Box((0.7,0.5),(0.2,0.2))
 #objects.Box((0.3,0.5),(0.3,0.3))
@@ -56,7 +64,9 @@ while running:
 	if e.type == pygame.QUIT:
 		running = 0
 	if e.type == pygame.KEYDOWN:
-		if e.key == pygame.K_UP:
+		if e.key == pygame.K_q:
+			running = False; break
+		elif e.key == pygame.K_UP:
 			box.addForce((0,-100))
 		elif e.key == pygame.K_DOWN:
 			box.addForce((0,100))
@@ -68,9 +78,9 @@ while running:
 			geom3.disable()
 		elif e.key == pygame.K_r:
 			geom3.enable()
-		elif e.key == pygame.K_q:
-			box.addTorque(1)
 		elif e.key == pygame.K_w:
+			box.addTorque(1)
+		elif e.key == pygame.K_e:
 			box.addTorque(-1)
 		elif e.key == pygame.K_d:
 			box.destruct()

@@ -24,23 +24,48 @@ def update_obj_list():
 		i.destroy()
 		obj_list.remove(i)
 	destroy_list = []
-	obj_list += create_list
+	for i in create_list:
+		i.construct()
+		obj_list.append(i)
 	create_list = []
 
 class Thing:
 	def __init__(self):
+		"""initializes the object. DO NOT ADD GEOMS/BODIES TO SPACES HERE!"""
 		create_list.append(self)
-	def draw(self):
-		pass	
-	def update(self):
+	def construct(self):
+		"""construct ODE-specific stuff (that needs to be done after the collision callback"""
 		pass
 	def destruct(self):
+		"""schedules for destruction, should not be overridden. """
 		destroy_list.append(self)
+	def destroy(self):
+		"""destroy ODE stuff here. """
+		pass
+	def draw(self):
+		""" custom draw logic"""
+		pass	
+	def update(self):
+		""" custom update logic"""
+		pass
+
+class DebugPoint(Thing):
+	def __init__(self, pos=(0,0), frames = 5):
+		self.pos = pos
+		self.frames = frames
+		Thing.__init__(self)
+	
+	def draw(self):
+		render.drawPoint(self.pos)
+	
+	def update(self):
+		self.frames -= 1
+		if self.frames <= 0:
+			self.destruct()
 
 class ODEThing(Thing):
 	""" handles the plane joint and such common among objects"""
-	def __init__(self):
-		Thing.__init__(self)
+	def construct(self):
 		self.joint = ode.Plane2DJoint(world)
 		self.joint.attach(self.body, ode.environment)
 		self.body.data = weakref.ref(self)
@@ -53,6 +78,8 @@ class ODEThing(Thing):
 		self.body.setQuaternion((r,0,0,z))
 		_, _, v = self.body.getAngularVel()
 		self.body.setAngularVel((0,0,v))
+		x, y, z = self.body.getPosition()
+		if (abs(z) > 0.01): print "what?"
 	def destroy(self):
 		self.geom.getSpace().remove(self.geom)
 		del self.geom; del self.joint; del self.body
@@ -69,45 +96,55 @@ class ODEThing(Thing):
 		
 class Box(ODEThing):
 	def __init__(self, pos=(0,0), lengths=(1,1), mass=1):
-		x, y = pos; L, H = lengths
+		self.x, self.y = pos
+		self.L, self.H = lengths
+		self.mass = mass
+		ODEThing.__init__(self)
+		
+	def construct(self):
 		self.body = ode.Body(world)
 		M = ode.Mass()
-		M.setBoxTotal(mass, L, H, 1)
+		M.setBoxTotal(self.mass, self.L, self.H, 1)
 		self.body.setMass(M)
-		self.body.setPosition((x,y,0))		
-		self.geom = ode.GeomBox(space, (L,H,1))
+		self.body.setPosition((self.x,self.y,0))		
+		self.geom = ode.GeomBox(space, (self.L,self.H,10))
 		self.geom.setBody(self.body)
-		ODEThing.__init__(self)
+		ODEThing.construct(self)
 
 class Ball(ODEThing):
 	def __init__(self, pos=(0,0), rad=1, mass=1):
-		x,y = pos
+		self.x, self.y = pos; self.rad = rad; self.mass = mass
+		ODEThing.__init__(self)
+	def construct(self):
 		self.body = ode.Body(world)
 		M = ode.Mass()
-		M.setSphereTotal(mass, rad)
+		M.setSphereTotal(self.mass, self.rad)
 		self.body.setMass(M)
-		self.body.setPosition((x,y,0))
-		self.geom = ode.GeomSphere(space, rad)
+		self.body.setPosition((self.x,self.y,0))
+		self.geom = ode.GeomSphere(space, self.rad)
 		self.geom.setBody(self.body)
-		ODEThing.__init__(self)
+		ODEThing.construct(self)
 
 class Capsule(ODEThing):
 	""" makes a capsule, pointing into x by default """
 	def __init__(self, pos=(0,0), radius=1, length=1, mass=1):
 		self.radius = radius
 		self.length = length
-		x, y = pos
+		self.x, self.y = pos; self.mass = mass
+		ODEThing.__init__(self)
+		
+	def construct(self):
 		self.body = ode.Body(world)
 		M = ode.Mass()
-		M.setCappedCylinderTotal(mass, 1, radius, length)
+		M.setCappedCylinderTotal(self.mass, 1, self.radius, self.length)
 		self.body.setMass(M)
-		self.body.setPosition((x,y,0))
+		self.body.setPosition((self.x,self.y,0))
 		self.geom = ode.GeomTransform(space)
-		self.geom2 = ode.GeomCapsule(None, radius, length)
+		self.geom2 = ode.GeomCapsule(None, self.radius, self.length)
 		self.geom2.setRotation((0,0,1,1,0,0,0,1,0)) # make z point into x
 		self.geom.setBody(self.body)
 		self.geom.setGeom(self.geom2)
-		ODEThing.__init__(self)
+		ODEThing.construct(self)
 	
 	def draw(self):
 		x, y, _ = self.body.getPosition()

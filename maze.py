@@ -141,6 +141,7 @@ class Maze(objects.Thing):
 				if y - y_begin != 0:
 					geom = ode.GeomBox(space, (2 * half_width, y - y_begin + 2 * half_width, half_width))
 					geom.setPosition((x, float(y + y_begin) / 2, 0))
+					geom.isImmovable = True
 					self.geoms.append(geom)
 				while y < self.height and self.cols[y][x] == 0:
 					y += 1
@@ -178,6 +179,7 @@ class Maze(objects.Thing):
 						x_last = x - half_width
 					geom = ode.GeomBox(space, (x_last - x_first, 2 * half_width, half_width))
 					geom.setPosition(((x_first + x_last) / 2, y, 0))
+					geom.isImmovable = True
 					self.geoms.append(geom)
 				
 				while x < self.width and self.rows[y][x] == 0:
