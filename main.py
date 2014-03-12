@@ -47,6 +47,7 @@ def near_callback(args, g1, g2):
 	for c in contacts:
 		c.setBounce(0.8)
 		c.setMu(25)
+		c.setMode(ode.ContactApprox1)
 		objects.DebugPoint(c.getContactGeomParams()[0])
 		j = ode.ContactJoint(objects.world, objects.contactgroup, c)
 		j.attach(g1.getBody(), g2.getBody())
@@ -94,7 +95,8 @@ while running:
 			ragdoll.setWantedPosition(1)
 		elif e.key == pygame.K_x:
 			for i in objects.obj_list:
-				i.addForce((100,0))
+				if hasattr(i, 'addForce'):
+					i.addForce((100,0))
 			
 	render.screen.fill((0,0,0))
 	#for i in objects.space:
