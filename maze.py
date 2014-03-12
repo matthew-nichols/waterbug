@@ -18,7 +18,10 @@ class Maze(objects.Thing):
 	def draw(self):
 		for geom in self.geoms:
 			render.drawGeom(geom)
-	
+			
+	def addForce(self, force):
+                pass
+        
 	def destroy(self):
 		for geom in self.geoms:
 			geom.getSpace().remove(geom)

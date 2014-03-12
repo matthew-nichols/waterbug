@@ -92,6 +92,9 @@ while running:
 			ragdoll.setWantedPosition(0)
 		elif e.key == pygame.K_h:
 			ragdoll.setWantedPosition(1)
+		elif e.key == pygame.K_x:
+			for i in objects.obj_list:
+				i.addForce((100,0))
 			
 	render.screen.fill((0,0,0))
 	#for i in objects.space:
