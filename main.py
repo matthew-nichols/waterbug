@@ -17,6 +17,10 @@ import objects
 import constants
 import cannon
 import Ragdoll
+import Water
+
+water = Water.Water()
+objects.construct_now(water)
 
 running = 1
 the_maze = maze.Maze(4,4)
@@ -97,6 +101,9 @@ while running:
 			for i in objects.obj_list:
 				if hasattr(i, 'addForce'):
 					i.addForce((100,0))
+	# FIXME: for some reason, this causes lag when mouse is moving
+	if e.type == pygame.MOUSEMOTION:
+		water.a1[e.pos[1]/water.size][e.pos[0]/water.size] = 255;
 			
 	render.screen.fill((0,0,0))
 	#for i in objects.space:
