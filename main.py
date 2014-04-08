@@ -18,6 +18,8 @@ import constants
 import cannon
 import Ragdoll
 import Water
+import three
+import charBox
 
 water = Water.Water()
 objects.construct_now(water)
@@ -69,6 +71,10 @@ objects.Capsule((1.7,1.7),0.04,0.4)
 ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3, 0.5))
 objects.construct_now(ragdoll)
 ragdoll.addTorque(10)
+threeleg = three.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 0.5))
+objects.construct_now(threeleg)
+characterBox = charBox.RagDoll(objects.world, objects.space, 1, 0.3, (0.5, 1.5))
+objects.construct_now(characterBox)
 
 while running:
 	e = event.poll()
@@ -101,6 +107,16 @@ while running:
 			for i in objects.obj_list:
 				if hasattr(i, 'addForce'):
 					i.addForce((100,0))
+		elif e.key == pygame.K_c:
+			threeleg.setWantedPosition(0)
+		elif e.key == pygame.K_v:
+			threeleg.setWantedPosition(1)
+		elif e.key == pygame.K_b:
+			threeleg.setWantedPosition(2)
+		elif e.key == pygame.K_n:
+			characterBox.setWantedPosition(0)
+		elif e.key == pygame.K_m:
+			characterBox.setWantedPosition(1)
 	# FIXME: for some reason, this causes lag when mouse is moving
 	if e.type == pygame.MOUSEMOTION:
 		water.a1[e.pos[1]/water.size][e.pos[0]/water.size] = 255;
