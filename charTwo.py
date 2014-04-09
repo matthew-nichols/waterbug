@@ -130,13 +130,11 @@ class RagDoll(objects.Thing):
         objects.Thing.__init__(self)
         
     def construct(self):
-        self.segment1 = self.customBody((-0.05, 0.0, 0.0), (-1.0, 0.0, 0.0), self.radius)
-        self.segment2 = self.customBody((0.5, 0.0, 0.07), (0.0, 0.0, sqrt(3)/2), self.radius)
-        self.segment3 = self.customBody((0.5, 0.0, -0.07), (0.0, 0.0, -sqrt(3)/2), self.radius)
+        self.segment1 = self.customBody((0.05, 0.0, 0.0), (0.5, 0.0, 0.0), self.radius)
+##        self.segment2 = self.customBody((-0.05, 0.0, 0.0), (-0.5, 0.0, 0.0), self.radius)
+        self.segment2 = self.customBody((-0.05, 0.0, 0.0), (-0.05, 0.0, 0.5), self.radius)
 
         self.joint1 = self.makeJoint(self.segment1, self.segment2, (0.0, 0.0, 0.0))
-        self.joint2 = self.makeJoint(self.segment1, self.segment3, (0.0, 0.0, 0.0))
-##        self.joint3 = self.makeJoint(self.segment1, self.segment3, (0.01, 0.0, 0.01))
 
     def customBody(self, p1, p2, radius):
         p1_x, _, p1_y = p1
@@ -175,15 +173,13 @@ class RagDoll(objects.Thing):
     
     def update(ragdoll):
         angle1 = ragdoll.joint1.getAngle()
-        angle2 = ragdoll.joint2.getAngle()
         angularVelocity1 = ragdoll.joint1.getAngleRate()
-        angularVelocity2 = ragdoll.joint2.getAngleRate()
+
         d = 0.3
         u = 0.9
+
         torque1 = u*(ragdoll.wantedAngle1 - angle1) + d*(0 - angularVelocity1)
-        torque2 = u*(ragdoll.wantedAngle2 - angle2) + d*(0 - angularVelocity2)
-        ragdoll.segment1.addTorque([0, torque1, 0])
-        ragdoll.segment2.addTorque([0, torque2, 0])
+        ragdoll.joint1.addTorque(torque1)
     
     def draw(self):
         for i in self.joints:
@@ -191,23 +187,12 @@ class RagDoll(objects.Thing):
     
     def setWantedPosition(ragdoll, pos):
         if pos == 0:
-            ragdoll.wantedAngle2 = 0
-            ragdoll.wantedAngle3 = 0
-            ragdoll.wantedAngle4 = 0
-            ragdoll.wantedAngle5 = 0
-            ragdoll.wantedAngle6 = 0
-            ragdoll.wantedAngle7 = 0
-            ragdoll.wantedAngle8 = 0
-            ragdoll.wantedAngle9 = 0
-        else:
-            ragdoll.wantedAngle2 = pi/2
-            ragdoll.wantedAngle3 = -pi/2
-            ragdoll.wantedAngle4 = -pi/2
-            ragdoll.wantedAngle5 = pi/2
-            ragdoll.wantedAngle6 = -pi/2
-            ragdoll.wantedAngle7 = pi/2
-            ragdoll.wantedAngle8 = pi/2
-            ragdoll.wantedAngle9 = -pi/2
+            ragdoll.wantedAngle1 = 0
+            
+        elif pos == 1:
+            ragdoll.wantedAngle1 = -pi/2
+
+            
     def addForce(self, force):
         pass
 
