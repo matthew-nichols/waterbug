@@ -127,8 +127,14 @@ while running:
 		elif e.key == pygame.K_1:
 			characterTriangle.setWantedPosition(1)
 		elif e.key == pygame.K_2:
-			characterTwo.setWantedPosition(0)
+			characterTriangle.setWantedPosition(2)
 		elif e.key == pygame.K_3:
+			characterTriangle.setWantedPosition(3)
+		elif e.key == pygame.K_4:
+			characterTriangle.setWantedPosition(4)
+		elif e.key == pygame.K_8:
+			characterTwo.setWantedPosition(0)
+		elif e.key == pygame.K_9:
 			characterTwo.setWantedPosition(1)
 	# FIXME: for some reason, this causes lag when mouse is moving
 	if e.type == pygame.MOUSEMOTION:

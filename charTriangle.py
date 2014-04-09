@@ -201,7 +201,14 @@ class RagDoll(objects.Thing):
             ragdoll.wantedAngle1 = pi/1.5
             ragdoll.wantedAngle2 = pi/1.5
         elif pos == 2:
-            ragdoll.wantedAngle2 = -pi/3
+            ragdoll.wantedAngle1 = -pi/1.5
+            ragdoll.wantedAngle2 = -pi/1.5
+        elif pos == 3:
+            ragdoll.wantedAngle1 = pi/2
+            ragdoll.wantedAngle2 = -pi/2
+        elif pos == 4:
+            ragdoll.wantedAngle1 = -pi/2
+            ragdoll.wantedAngle2 = pi/2
             
     def addForce(self, force):
         pass
