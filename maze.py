@@ -131,8 +131,9 @@ class Maze(objects.Thing):
 				sys.stdout.write("┼ ")
 		print "┼"
 				
-	def make_geoms(self, space, half_width = 0.1):
-		self.geoms = []
+	def make_geoms(self, space, half_width = 0.1, offset = (0,0)):
+		if not hasattr(self, 'geoms'): self.geoms = []
+		offsetx, offsety = offset
 		y = 0
 			
 		for x in xrange(self.width+1):
@@ -143,7 +144,7 @@ class Maze(objects.Thing):
 					y += 1
 				if y - y_begin != 0:
 					geom = ode.GeomBox(space, (2 * half_width, y - y_begin + 2 * half_width, half_width))
-					geom.setPosition((x, float(y + y_begin) / 2, 0))
+					geom.setPosition((x + offsetx, float(y + y_begin) / 2 + offsety, 0))
 					geom.isImmovable = True
 					self.geoms.append(geom)
 				while y < self.height and self.cols[y][x] == 0:
@@ -181,7 +182,7 @@ class Maze(objects.Thing):
 					else:
 						x_last = x - half_width
 					geom = ode.GeomBox(space, (x_last - x_first, 2 * half_width, half_width))
-					geom.setPosition(((x_first + x_last) / 2, y, 0))
+					geom.setPosition(((x_first + x_last) / 2 + offsetx, y + offsety, 0))
 					geom.isImmovable = True
 					self.geoms.append(geom)
 				

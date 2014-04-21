@@ -23,8 +23,8 @@ import charBox
 import charTriangle
 import charTwo
 
-water = Water.Water()
-objects.construct_now(water)
+#water = Water.Water()
+#objects.construct_now(water)
 
 running = 1
 the_maze = maze.Maze(4,4)
@@ -32,6 +32,7 @@ the_maze.generate_simple2()
 maze_space = ode.HashSpace(objects.space)
 maze_space.isImmovable = True
 the_maze.make_geoms(maze_space)
+the_maze.make_geoms(maze_space, 0.1, (5,0))
 
 ball_width = 0.05
 
@@ -54,7 +55,7 @@ def near_callback(args, g1, g2):
 	# TODO: if d1 and/or d2 are not None, use them to handle collision
 	for c in contacts:
 		c.setBounce(0.8)
-		c.setMu(25)
+		c.setMu(250)
 		c.setMode(ode.ContactApprox1)
 		objects.DebugPoint(c.getContactGeomParams()[0])
 		j = ode.ContactJoint(objects.world, objects.contactgroup, c)
@@ -73,14 +74,17 @@ objects.Capsule((1.7,1.7),0.04,0.4)
 ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3, 0.5))
 objects.construct_now(ragdoll)
 ragdoll.addTorque(10)
-characterThree = charThree.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 0.5))
-objects.construct_now(characterThree)
-characterBox = charBox.RagDoll(objects.world, objects.space, 1, 0.3, (0.5, 1.5))
-objects.construct_now(characterBox)
+ragdoll2 = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3+5, 0.5))
+objects.construct_now(ragdoll2)
+ragdoll2.addTorque(10)
+#characterThree = charThree.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 0.5))
+#objects.construct_now(characterThree)
+#characterBox = charBox.RagDoll(objects.world, objects.space, 1, 0.3, (0.5, 1.5))
+#objects.construct_now(characterBox)
 characterTriangle = charTriangle.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 1.5))
-objects.construct_now(characterTriangle)
-characterTwo = charTwo.RagDoll(objects.world, objects.space, 1, 0.3, (2.5, 1.5))
-objects.construct_now(characterTwo)
+#objects.construct_now(characterTriangle)
+#characterTwo = charTwo.RagDoll(objects.world, objects.space, 1, 0.3, (2.5, 1.5))
+#objects.construct_now(characterTwo)
 while running:
 	e = event.poll()
 	if e.type == pygame.QUIT:
@@ -100,28 +104,28 @@ while running:
 			box.addTorque(1)
 		elif e.key == pygame.K_e:
 			box.addTorque(-1)
-		elif e.key == pygame.K_d:
-			box.destruct()
-		elif e.key == pygame.K_f:
-			print pygame.time.get_ticks(), objgraph.by_type('ode.Plane2DJoint')
-		elif e.key == pygame.K_g:
+		elif e.key == pygame.K_a:
 			ragdoll.setWantedPosition(0)
-		elif e.key == pygame.K_h:
+		elif e.key == pygame.K_s:
 			ragdoll.setWantedPosition(1)
+		elif e.key == pygame.K_k:
+			ragdoll2.setWantedPosition(0)
+		elif e.key == pygame.K_l:
+			ragdoll2.setWantedPosition(1)
 		elif e.key == pygame.K_x:
 			for i in objects.obj_list:
 				if hasattr(i, 'addForce'):
 					i.addForce((100,0))
-		elif e.key == pygame.K_c:
-			characterThree.setWantedPosition(0)
-		elif e.key == pygame.K_v:
-			characterThree.setWantedPosition(1)
-		elif e.key == pygame.K_b:
-			characterThree.setWantedPosition(2)
-		elif e.key == pygame.K_n:
-			characterBox.setWantedPosition(0)
-		elif e.key == pygame.K_m:
-			characterBox.setWantedPosition(1)
+#		elif e.key == pygame.K_c:
+#			characterThree.setWantedPosition(0)
+#		elif e.key == pygame.K_v:
+#			characterThree.setWantedPosition(1)
+#		elif e.key == pygame.K_b:
+#			characterThree.setWantedPosition(2)
+#		elif e.key == pygame.K_n:
+#			characterBox.setWantedPosition(0)
+#		elif e.key == pygame.K_m:
+#			characterBox.setWantedPosition(1)
 		elif e.key == pygame.K_0:
 			characterTriangle.setWantedPosition(0)
 		elif e.key == pygame.K_1:
@@ -132,13 +136,13 @@ while running:
 			characterTriangle.setWantedPosition(3)
 		elif e.key == pygame.K_4:
 			characterTriangle.setWantedPosition(4)
-		elif e.key == pygame.K_8:
-			characterTwo.setWantedPosition(0)
-		elif e.key == pygame.K_9:
-			characterTwo.setWantedPosition(1)
+#		elif e.key == pygame.K_8:
+#			characterTwo.setWantedPosition(0)
+#		elif e.key == pygame.K_9:
+#			characterTwo.setWantedPosition(1)
 	# FIXME: for some reason, this causes lag when mouse is moving
-	if e.type == pygame.MOUSEMOTION:
-		water.a1[e.pos[1]/water.size][e.pos[0]/water.size] = 255;
+	#if e.type == pygame.MOUSEMOTION:
+	#	water.a1[e.pos[1]/water.size][e.pos[0]/water.size] = 255;
 			
 	render.screen.fill((0,0,0))
 	#for i in objects.space:
