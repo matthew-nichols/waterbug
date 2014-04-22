@@ -83,6 +83,7 @@ ragdoll2.addTorque(10)
 #objects.construct_now(characterBox)
 characterTriangle = charTriangle.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 1.5))
 #objects.construct_now(characterTriangle)
+characterTriangle2 = charTriangle.RagDoll(objects.world, objects.space, 1, 0.3, (1.5+5, 1.5))
 #characterTwo = charTwo.RagDoll(objects.world, objects.space, 1, 0.3, (2.5, 1.5))
 #objects.construct_now(characterTwo)
 while running:
@@ -126,16 +127,26 @@ while running:
 #			characterBox.setWantedPosition(0)
 #		elif e.key == pygame.K_m:
 #			characterBox.setWantedPosition(1)
-		elif e.key == pygame.K_0:
-			characterTriangle.setWantedPosition(0)
 		elif e.key == pygame.K_1:
-			characterTriangle.setWantedPosition(1)
+			characterTriangle.setWantedPosition(0)
 		elif e.key == pygame.K_2:
-			characterTriangle.setWantedPosition(2)
+			characterTriangle.setWantedPosition(1)
 		elif e.key == pygame.K_3:
-			characterTriangle.setWantedPosition(3)
+			characterTriangle.setWantedPosition(2)
 		elif e.key == pygame.K_4:
-			characterTriangle.setWantedPosition(4)
+			characterTriangle.setWantedPosition(5)
+		elif e.key == pygame.K_5:
+			characterTriangle.setWantedPosition(6)
+		elif e.key == pygame.K_6:
+			characterTriangle2.setWantedPosition(0)
+		elif e.key == pygame.K_7:
+			characterTriangle2.setWantedPosition(1)
+		elif e.key == pygame.K_8:
+			characterTriangle2.setWantedPosition(2)
+		elif e.key == pygame.K_9:
+			characterTriangle2.setWantedPosition(5)
+		elif e.key == pygame.K_0:
+			characterTriangle2.setWantedPosition(6)
 #		elif e.key == pygame.K_8:
 #			characterTwo.setWantedPosition(0)
 #		elif e.key == pygame.K_9:
