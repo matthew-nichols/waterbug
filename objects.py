@@ -53,6 +53,10 @@ class Thing:
 	def update(self):
 		""" custom update logic"""
 		pass
+	
+	def onCollision(self,other):
+		""" returns True if physics should proceed, otherwise return False """
+		return True
 
 class DebugPoint(Thing):
 	def __init__(self, pos=(0,0), frames = 5):

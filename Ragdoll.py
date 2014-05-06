@@ -2,6 +2,7 @@ import math
 from math import *
 import objects
 import render
+import weakref
 
 import ode
 
@@ -162,6 +163,7 @@ class RagDoll(objects.Thing):
         body = objects.Capsule( ( (p1_x + p2_x)/2, (p1_y + p2_y)/2 ), radius, math.sqrt( (p1_x - p2_x)**2 + (p1_y - p2_y)**2 ), 1, math.atan2(p2_y - p1_y, p2_x - p1_x))
         objects.construct_now(body)
         self.totalMass += 1
+        body.body.data = weakref.ref(self) # TODO: better way of doing this sort of thing
         return body
 
     def makeJoint(self, seg1, seg2, anchor):
