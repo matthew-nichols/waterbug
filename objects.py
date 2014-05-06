@@ -12,38 +12,38 @@ world.setCFM(1e-5)
 contactgroup = ode.JointGroup()
 space = ode.HashSpace()
 
-obj_list = []
+obj_list = set()
 
-create_list = []
-destroy_list = []
+create_list = set()
+destroy_list = set()
 
 def update_obj_list():
 	global obj_list, destroy_list, create_list
-	# really inefficient...
+	# should be more efficient, and handle double-deletions
 	for i in destroy_list:
 		i.destroy()
 		obj_list.remove(i)
-	destroy_list = []
+	destroy_list.clear()
 	for i in create_list:
 		i.construct()
-		obj_list.append(i)
-	create_list = []
+		obj_list.add(i)
+	create_list.clear()
 
 def construct_now(obj):
 	obj.construct()
 	create_list.remove(obj)
-	obj_list.append(obj)
+	obj_list.add(obj)
 
 class Thing:
 	def __init__(self):
 		"""initializes the object. DO NOT ADD GEOMS/BODIES TO SPACES HERE!"""
-		create_list.append(self)
+		create_list.add(self)
 	def construct(self):
-		"""construct ODE-specific stuff (that needs to be done after the collision callback"""
+		"""construct ODE-specific stuff (that needs to be done after the collision callback)"""
 		pass
 	def destruct(self):
 		"""schedules for destruction, should not be overridden. """
-		destroy_list.append(self)
+		destroy_list.add(self)
 	def destroy(self):
 		"""destroy ODE stuff here. """
 		pass

@@ -45,7 +45,9 @@ class Maze(objects.Thing):
 				self.rows[self.height][x] = 0
 		for y in xrange(self.height):
 			self.cols[y][0] = 1
-			self.cols[y][self.width] = 1	
+			self.cols[y][self.width] = 1
+		
+		self.rows[1][0] = 0	
 		
 	def generate_simple(self):
 		self.generate_random()	

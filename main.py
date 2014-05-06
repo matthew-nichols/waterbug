@@ -37,56 +37,53 @@ the_maze.make_geoms(maze_space, 0.1, (5,0))
 ball_width = 0.05
 
 def near_callback(args, g1, g2):
-	if g1.isSpace() or g2.isSpace():
-		if g1.isSpace() and not getattr(g1, 'isImmovable', False):
-			g1.collide(args, near_callback)
-		if g2.isSpace() and not getattr(g2, 'isImmovable', False):
-			g2.collide(args, near_callback)
-		ode.collide2(g1, g2, args, near_callback)
-	contacts = ode.collide(g1, g2)
-	#if getattr(g1, 'isImmovable', False) and getattr(g2, 'isImmovable', False):
-	#	return
+	try:
+		if g1.isSpace() or g2.isSpace():
+			if g1.isSpace() and not getattr(g1, 'isImmovable', False):
+				g1.collide(args, near_callback)
+			if g2.isSpace() and not getattr(g2, 'isImmovable', False):
+				g2.collide(args, near_callback)
+			ode.collide2(g1, g2, args, near_callback)
+		contacts = ode.collide(g1, g2)
 	
-	if ode.areConnected(g1.getBody(), g2.getBody()):
-		return
+		if ode.areConnected(g1.getBody(), g2.getBody()):
+			return
 	
-	d1 = getattr(g1.getBody(), 'data', None)
-	d2 = getattr(g2.getBody(), 'data', None)
+		d1 = getattr(g1.getBody(), 'data', None)
+		d2 = getattr(g2.getBody(), 'data', None)
 	
-	if d1 is not None: d1 = d1()
-	if d2 is not None: d2 = d2()
-	# TODO: if d1 and/or d2 are not None, use them to handle collision
+		if d1 is not None: d1 = d1()
+		if d2 is not None: d2 = d2()
+		# TODO: if d1 and/or d2 are not None, use them to handle collision
 	
-	r1 = True; r2 = True
-	
-	if len(contacts) > 0:
-		if d1 is not None and hasattr(d1, 'onCollision'):
-			r1 = d1.onCollision(d2)
-		if d2 is not None and hasattr(d2, 'onCollision'):
-			r2 = d2.onCollision(d1)
-	
-		if r1 and r2:
-			for c in contacts:
-				c.setBounce(0.8)
-				c.setMu(250)
-				c.setMode(ode.ContactApprox1)
-				objects.DebugPoint(c.getContactGeomParams()[0])
-				j = ode.ContactJoint(objects.world, objects.contactgroup, c)
-				j.attach(g1.getBody(), g2.getBody())
+		r1 = True; r2 = True
+		
+		if len(contacts) > 0:
+			if d1 is not None and hasattr(d1, 'onCollision'):
+				r1 = d1.onCollision(d2)
+			if d2 is not None and hasattr(d2, 'onCollision'):
+				r2 = d2.onCollision(d1)
+
+			if r1 and r2:
+				for c in contacts:
+					c.setBounce(0.8)
+					c.setMu(250)
+					c.setMode(ode.ContactApprox1)
+					objects.DebugPoint(c.getContactGeomParams()[0])
+					j = ode.ContactJoint(objects.world, objects.contactgroup, c)
+					j.attach(g1.getBody(), g2.getBody())
+	except BaseException, e:
+		print "Exception in collision handler: ", str(e)
 
 sim_time = pygame.time.get_ticks() / 1000.0
-		
-#box = objects.Capsule((0.5,0.5),0.04, 0.4)
-#box = objects.Box((0.5,0.5),(0.4,0.4))
+
 box = objects.Ball((2.5, 0.5),0.1)
 def thisCollision(other):
-	if other is not None:
-		print getattr(other, 'tag', 'no tag')
-
 	if other is not None and getattr(other, 'tag', '') == 'player':
 		print "Ball & Player!"
 	return True
 box.onCollision = thisCollision
+
 #objects.Box((0.7,0.5),(0.2,0.2))
 #objects.Box((0.3,0.5),(0.3,0.3))
 #objects.Ball((1.3,1.3),0.2)
