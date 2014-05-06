@@ -66,11 +66,11 @@ def drawCapsule(pos, a, b, costheta, sintheta):
 	drawCircle((x + a/2 * costheta, y - a/2 * sintheta), b/2)
 	drawCircle((x - a/2 * costheta, y + a/2 * sintheta), b/2)
 
-def drawCircle(pos, rad):
+def drawCircle(pos, rad, color = blue):
 	x, y = pos
 	x, y = to_screen_pnt(x, y)
 	rad = to_screen_len(rad)
-	draw.circle(screen, blue, (int(x), int(y)), int(rad), 1)
+	draw.circle(screen, color, (int(x), int(y)), int(rad), 1)
 
 def drawLine(p1, p2, color = blue):
 	x = p1[0]; y = p1[1]

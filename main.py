@@ -22,6 +22,7 @@ import charThree
 import charBox
 import charTriangle
 import charTwo
+import Pickup
 
 #water = Water.Water()
 #objects.construct_now(water)
@@ -51,6 +52,9 @@ def near_callback(args, g1, g2):
 	
 		d1 = getattr(g1.getBody(), 'data', None)
 		d2 = getattr(g2.getBody(), 'data', None)
+		
+		if d1 is None: d1 = getattr(g1, 'data', None)
+		if d2 is None: d2 = getattr(g2, 'data', None)
 	
 		if d1 is not None: d1 = d1()
 		if d2 is not None: d2 = d2()
@@ -95,6 +99,8 @@ ragdoll.addTorque(10)
 ragdoll2 = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3+5, 0.5))
 objects.construct_now(ragdoll2)
 ragdoll2.addTorque(10)
+
+the_pickup = Pickup.Pickup((3.5, 3.5), 5)
 
 ragdoll.tag = 'player'
 ragdoll2.tag = 'player'
