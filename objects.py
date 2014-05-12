@@ -14,8 +14,8 @@ space = ode.HashSpace()
 
 obj_list = set()
 
-create_list = set()
-destroy_list = set()
+create_list = []
+destroy_list = []
 
 def update_obj_list():
 	global obj_list, destroy_list, create_list
@@ -23,27 +23,35 @@ def update_obj_list():
 	for i in destroy_list:
 		i.destroy()
 		obj_list.remove(i)
-	destroy_list.clear()
+	destroy_list = []
 	for i in create_list:
 		i.construct()
 		obj_list.add(i)
-	create_list.clear()
+	create_list = []
 
 def construct_now(obj):
 	obj.construct()
 	create_list.remove(obj)
 	obj_list.add(obj)
+	
+def construct_soon(obj):
+	if obj not in create_list:
+		create_list.append(obj)
+
+def destruct_soon(obj):
+	if obj not in destroy_list:
+		destroy_list.append(obj)
 
 class Thing:
 	def __init__(self):
 		"""initializes the object. DO NOT ADD GEOMS/BODIES TO SPACES HERE!"""
-		create_list.add(self)
+		construct_soon(self)
 	def construct(self):
 		"""construct ODE-specific stuff (that needs to be done after the collision callback)"""
 		pass
 	def destruct(self):
 		"""schedules for destruction, should not be overridden. """
-		destroy_list.add(self)
+		destruct_soon(self)
 	def destroy(self):
 		"""destroy ODE stuff here. """
 		pass
