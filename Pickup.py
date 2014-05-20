@@ -6,7 +6,7 @@ import render
 import weakref
 
 class XFactor(objects.Thing):
-	def __init__(self):
+	def __init__(self, player):
 		objects.Thing.__init__(self)
 		self.timeout = 5.0 # seconds
 	def update(self):
@@ -16,12 +16,28 @@ class XFactor(objects.Thing):
 				i.addForce((5,0))
 		if self.timeout <= 0:
 			self.destruct()
+XFactor.for_player = True
+
+class Strength(objects.Thing):
+	def __init__(self, helper):
+		objects.Thing.__init__(self)
+		self.timeout = 5.0
+		self.helper = helper
+		helper.become_stronger()
+	def update(self):
+		self.timeout -= constants.dt
+		if self.timeout <= 0:
+			self.helper.become_weaker()
+			self.destruct()
+Strength.for_helper = True
+			
 
 class Pickup(objects.Thing):
-	def __init__(self, pos, offset, radius = 0.1):
+	def __init__(self, pos, offset, pickup, radius = 0.1):
 		self.pos = pos
 		self.offset = offset
 		self.radius = 0.05
+		self.pickup = pickup
 		objects.Thing.__init__(self)
 	
 	def construct(self):
@@ -42,7 +58,10 @@ class Pickup(objects.Thing):
 		render.drawCircle((self.pos[0] + self.offset, self.pos[1]), self.radius, render.red)
 	
 	def onCollision(self, other):
-		if getattr(other, 'tag', '') == 'player':
-			XFactor()
+		if getattr(self.pickup, 'for_helper', False) and getattr(other, 'tag', '') == 'helper':
+			self.pickup(other)
+			self.destruct()
+		elif getattr(self.pickup, 'for_player', False) and getattr(other, 'tag', '') == 'player':
+			self.pickup(other)
 			self.destruct()
 		return False

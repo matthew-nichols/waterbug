@@ -125,6 +125,7 @@ class RagDoll(objects.Thing):
         self.wantedAngle9 = 0
         self.wantedAngle10 = 0
         self.wantedAngle11 = 0
+        self.wantedPos = 0
         
         self.radius = 0.05
         objects.Thing.__init__(self)
@@ -230,6 +231,7 @@ class RagDoll(objects.Thing):
             render.drawPoint(i.getAnchor(), render.green)
     
     def setWantedPosition(ragdoll, pos):
+    	ragdoll.wantedPos = pos
         if pos == 0:
             ragdoll.wantedAngle2 = 0
             ragdoll.wantedAngle3 = 0

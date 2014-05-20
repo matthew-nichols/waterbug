@@ -23,11 +23,8 @@ import charBox
 import charTriangle
 import charTwo
 import Pickup
+import Helper
 
-#water = Water.Water()
-#objects.construct_now(water)
-
-running = 1
 the_maze = maze.Maze(4,4)
 the_maze.generate_simple2()
 maze_space = ode.HashSpace(objects.space)
@@ -81,17 +78,6 @@ def near_callback(args, g1, g2):
 
 sim_time = pygame.time.get_ticks() / 1000.0
 
-box = objects.Ball((2.5, 0.5),0.1)
-def thisCollision(other):
-	if other is not None and getattr(other, 'tag', '') == 'player':
-		print "Ball & Player!"
-	return True
-box.onCollision = thisCollision
-
-#objects.Box((0.7,0.5),(0.2,0.2))
-#objects.Box((0.3,0.5),(0.3,0.3))
-#objects.Ball((1.3,1.3),0.2)
-#cannon.Cannon((3.5,3.5),(1,0.2))
 objects.Capsule((1.7,1.7),0.04,0.4)
 ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3, 0.5))
 objects.construct_now(ragdoll)
@@ -100,91 +86,71 @@ ragdoll2 = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3+5, 0.5))
 objects.construct_now(ragdoll2)
 ragdoll2.addTorque(10)
 
-the_pickup = Pickup.Pickup((3.5, 3.5), 5)
+the_pickup = Pickup.Pickup((3.5, 3.5), 5, Pickup.XFactor)
+strength = Pickup.Pickup((2.5, 2.5), 5, Pickup.Strength)
 
 ragdoll.tag = 'player'
 ragdoll2.tag = 'player'
-#characterThree = charThree.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 0.5))
-#objects.construct_now(characterThree)
-#characterBox = charBox.RagDoll(objects.world, objects.space, 1, 0.3, (0.5, 1.5))
-#objects.construct_now(characterBox)
-characterTriangle = charTriangle.RagDoll(objects.world, objects.space, 1, 0.3, (1.5, 1.5))
-#objects.construct_now(characterTriangle)
-characterTriangle2 = charTriangle.RagDoll(objects.world, objects.space, 1, 0.3, (1.5+5, 1.5))
-#characterTwo = charTwo.RagDoll(objects.world, objects.space, 1, 0.3, (2.5, 1.5))
-#objects.construct_now(characterTwo)
+
+helper1 = Helper.Helper((0.5, 2.5))
+helper2 = Helper.Helper((5.5, 2.5))
+helper1.tag = 'helper'
+helper2.tag = 'helper'
+
+running = True
 while running:
-	e = event.poll()
-	if e.type == pygame.QUIT:
-		running = 0
-	if e.type == pygame.KEYDOWN:
-		if e.key == pygame.K_q:
+	while True:
+		e = event.poll()
+		if e.type == pygame.NOEVENT:
+			break
+		elif e.type == pygame.QUIT:
 			running = False; break
-		elif e.key == pygame.K_UP:
-			box.addForce((0,-100))
-		elif e.key == pygame.K_DOWN:
-			box.addForce((0,100))
-		elif e.key == pygame.K_LEFT:
-			box.addForce((-100,0))
-		elif e.key == pygame.K_RIGHT:
-			box.addForce((100,0))
-		elif e.key == pygame.K_w:
-			box.addTorque(1)
-		elif e.key == pygame.K_e:
-			box.addTorque(-1)
-		elif e.key == pygame.K_a:
-			ragdoll.setWantedPosition(0)
-		elif e.key == pygame.K_s:
-			ragdoll.setWantedPosition(1)
-		elif e.key == pygame.K_k:
-			ragdoll2.setWantedPosition(0)
-		elif e.key == pygame.K_l:
-			ragdoll2.setWantedPosition(1)
-		elif e.key == pygame.K_x:
-			for i in objects.obj_list:
-				if hasattr(i, 'addForce'):
-					i.addForce((100,0))
-#		elif e.key == pygame.K_c:
-#			characterThree.setWantedPosition(0)
-#		elif e.key == pygame.K_v:
-#			characterThree.setWantedPosition(1)
-#		elif e.key == pygame.K_b:
-#			characterThree.setWantedPosition(2)
-#		elif e.key == pygame.K_n:
-#			characterBox.setWantedPosition(0)
-#		elif e.key == pygame.K_m:
-#			characterBox.setWantedPosition(1)
-		elif e.key == pygame.K_1:
-			characterTriangle.setWantedPosition(0)
-		elif e.key == pygame.K_2:
-			characterTriangle.setWantedPosition(1)
-		elif e.key == pygame.K_3:
-			characterTriangle.setWantedPosition(2)
-		elif e.key == pygame.K_4:
-			characterTriangle.setWantedPosition(5)
-		elif e.key == pygame.K_5:
-			characterTriangle.setWantedPosition(6)
-		elif e.key == pygame.K_6:
-			characterTriangle2.setWantedPosition(0)
-		elif e.key == pygame.K_7:
-			characterTriangle2.setWantedPosition(1)
-		elif e.key == pygame.K_8:
-			characterTriangle2.setWantedPosition(2)
-		elif e.key == pygame.K_9:
-			characterTriangle2.setWantedPosition(5)
-		elif e.key == pygame.K_0:
-			characterTriangle2.setWantedPosition(6)
-#		elif e.key == pygame.K_8:
-#			characterTwo.setWantedPosition(0)
-#		elif e.key == pygame.K_9:
-#			characterTwo.setWantedPosition(1)
+		elif e.type == pygame.KEYDOWN:
+			if e.key == pygame.K_ESCAPE:
+				running = False; break
+			elif e.key == pygame.K_w:
+				helper1.dirs[0] = True
+			elif e.key == pygame.K_a:
+				helper1.dirs[1] = True
+			elif e.key == pygame.K_s:
+				helper1.dirs[2] = True
+			elif e.key == pygame.K_d:
+				helper1.dirs[3] = True
+			elif e.key == pygame.K_q:
+				ragdoll.setWantedPosition(not ragdoll.wantedPos)
+			elif e.key == pygame.K_i:
+				helper2.dirs[0] = True
+			elif e.key == pygame.K_j:
+				helper2.dirs[1] = True
+			elif e.key == pygame.K_k:
+				helper2.dirs[2] = True
+			elif e.key == pygame.K_l:
+				helper2.dirs[3] = True
+			elif e.key == pygame.K_u:
+				ragdoll2.setWantedPosition(not ragdoll2.wantedPos)
+		elif e.type == pygame.KEYUP:
+			if e.key == pygame.K_w:
+				helper1.dirs[0] = False
+			elif e.key == pygame.K_a:
+				helper1.dirs[1] = False
+			elif e.key == pygame.K_s:
+				helper1.dirs[2] = False
+			elif e.key == pygame.K_d:
+				helper1.dirs[3] = False
+			elif e.key == pygame.K_i:
+				helper2.dirs[0] = False
+			elif e.key == pygame.K_j:
+				helper2.dirs[1] = False
+			elif e.key == pygame.K_k:
+				helper2.dirs[2] = False
+			elif e.key == pygame.K_l:
+				helper2.dirs[3] = False
+			
 	# FIXME: for some reason, this causes lag when mouse is moving
 	#if e.type == pygame.MOUSEMOTION:
 	#	water.a1[e.pos[1]/water.size][e.pos[0]/water.size] = 255;
 			
 	render.screen.fill((0,0,0))
-	#for i in objects.space:
-	#	render.drawGeom(i)
 	objects.update_obj_list()
 	for i in objects.obj_list:
 		i.draw()
