@@ -78,7 +78,7 @@ def near_callback(args, g1, g2):
 
 sim_time = pygame.time.get_ticks() / 1000.0
 
-objects.Capsule((1.7,1.7),0.04,0.4)
+#objects.Capsule((1.7,1.7),0.04,0.4)
 ragdoll = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3, 0.5))
 objects.construct_now(ragdoll)
 ragdoll.addTorque(10)
@@ -150,7 +150,7 @@ while running:
 	#if e.type == pygame.MOUSEMOTION:
 	#	water.a1[e.pos[1]/water.size][e.pos[0]/water.size] = 255;
 			
-	render.screen.fill((0,0,0))
+	render.screen.fill(render.actual_color((0,0,0)))
 	objects.update_obj_list()
 	for i in objects.obj_list:
 		i.draw()
