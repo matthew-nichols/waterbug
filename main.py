@@ -10,6 +10,7 @@ from pygame import Color
 import ode
 import math
 import objgraph
+import datetime
 
 import render
 import maze
@@ -128,6 +129,10 @@ while running:
 				helper2.dirs[3] = True
 			elif e.key == pygame.K_u:
 				ragdoll2.setWantedPosition(not ragdoll2.wantedPos)
+			elif e.key == pygame.K_F1:
+				render.invert_colors = not render.invert_colors
+			elif e.key == pygame.K_F2:
+				pygame.image.save(render.screen, datetime.datetime.now().strftime("screenshot-%Y-%m-%d-%H-%M-%S.png"))
 		elif e.type == pygame.KEYUP:
 			if e.key == pygame.K_w:
 				helper1.dirs[0] = False

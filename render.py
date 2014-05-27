@@ -17,6 +17,8 @@ red = Color(255,0,0)
 green = Color(0,255,0)
 blue = Color(0,0,255)
 
+invert_colors = False
+
 def actual_color(c):
 	if type(c) is tuple:
 		if len(c) == 3:
@@ -29,15 +31,17 @@ def actual_color(c):
 		c = Color(c.r, c.g, c.b, c.a)
 	else:
 		c = Color(c)
-		
-	h, s, v, a = c.hsva
-	#h = (h + 180.0) % 360.0
-	#s = (s + 50.0) % 100.0
-	v = (v + 99.9) % 100.0
-	print v
-	c.hsva = (h, s, v, a)
-	return c
-	return Color(255 - c.r, 255 - c.g, 255 - c.b, c.a)
+	
+	if invert_colors:
+		h, s, v, a = c.hsva
+		#h = (h + 180.0) % 360.0
+		#s = (s + 50.0) % 100.0
+		v = (v + 99.9) % 100.0
+		c.hsva = (h, s, v, a)
+		return c
+		return Color(255 - c.r, 255 - c.g, 255 - c.b, c.a)
+	else:
+		return c
 
 the_denom = 5
 # automate these and make them less ridiculous
