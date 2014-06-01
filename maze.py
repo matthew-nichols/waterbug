@@ -30,15 +30,11 @@ class Maze(objects.Thing):
 	def generate_random(self):
 		self.rows = [ [random.choice([0,1]) for x in range(self.width)] for y in range(self.height+1) ]
 		self.cols = [ [random.choice([0,1]) for x in range(self.width+1)] for y in range(self.height) ]
-		# start always at y=0, end at y=height-1
-		self.start = random.randint(0, self.width - 1)
+		# end at y=height-1
 		self.end = random.randint(0, self.width - 1)
 		
 		for x in xrange(self.width):
-			if x != self.start:
-				self.rows[0][x] = 1
-			else:
-				self.rows[0][x] = 0
+			self.rows[0][x] = 1
 			if x != self.end:
 				self.rows[self.height][x] = 1
 			else:

@@ -83,7 +83,8 @@ class DebugPoint(Thing):
 class ODEThing(Thing):
 	""" handles the plane joint and such common among objects"""
 	def construct(self):
-		self.joint = ode.Plane2DJoint(world)
+		self.jointgroup = ode.JointGroup()
+		self.joint = ode.Plane2DJoint(world, self.jointgroup)
 		self.joint.attach(self.body, ode.environment)
 		self.body.data = weakref.ref(self)
 	def draw(self):
@@ -95,8 +96,7 @@ class ODEThing(Thing):
 		self.body.setQuaternion((r,0,0,z))
 		_, _, v = self.body.getAngularVel()
 		self.body.setAngularVel((0,0,v))
-		x, y, z = self.body.getPosition()
-		#if (abs(z) > 0.01): print "what?"
+		
 	def destroy(self):
 		self.geom.getSpace().remove(self.geom)
 		del self.geom; del self.joint; del self.body

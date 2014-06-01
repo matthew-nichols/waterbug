@@ -6,6 +6,7 @@ import render
 import weakref
 
 class XFactor(objects.Thing):
+	for_player = True
 	def __init__(self, player):
 		objects.Thing.__init__(self)
 		self.timeout = 5.0 # seconds
@@ -16,9 +17,9 @@ class XFactor(objects.Thing):
 				i.addForce((5,0))
 		if self.timeout <= 0:
 			self.destruct()
-XFactor.for_player = True
 
 class Strength(objects.Thing):
+	for_helper = True
 	def __init__(self, helper):
 		objects.Thing.__init__(self)
 		self.timeout = 5.0
@@ -29,7 +30,16 @@ class Strength(objects.Thing):
 		if self.timeout <= 0:
 			self.helper.become_weaker()
 			self.destruct()
-Strength.for_helper = True
+
+class OpenDoor(objects.Thing):
+	for_player = True
+	def __init__(self, maze):
+		objects.Thing.__init__(self)
+		self.maze = maze
+	
+	def __call__(self, player):
+		self.maze.remove_door()
+		self.destruct()
 			
 
 class Pickup(objects.Thing):
