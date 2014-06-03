@@ -128,6 +128,16 @@ class Maze(objects.Thing):
 			else:
 				sys.stdout.write("┼ ")
 		print "┼"
+		
+	def make_doors(self, space, half_width = 0.1, offset = (0,0)):
+		geom1 = ode.GeomBox(space, (1 - 2 * half_width, 2 * half_width, half_width))
+		geom1.setPosition((self.end + 0.5, self.height, 0))
+		geom1.color = render.red
+		x, y = offset
+		geom2 = ode.GeomBox(space, (1 - 2 * half_width, 2 * half_width, half_width))
+		geom2.setPosition((self.end + 0.5 + x, self.height + y, 0))
+		geom2.color = render.red
+		return [geom1, geom2]
 				
 	def make_geoms(self, space, half_width = 0.1, offset = (0,0)):
 		if not hasattr(self, 'geoms'): self.geoms = []

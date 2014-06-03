@@ -62,8 +62,7 @@ def drawGeom(geom):
 		p2 = to_screen_pnt(x + a/2 * costheta - b/2 * sintheta, y - a/2 * sintheta - b/2 * costheta)
 		p3 = to_screen_pnt(x - a/2 * costheta - b/2 * sintheta, y + a/2 * sintheta - b/2 * costheta)
 		p4 = to_screen_pnt(x - a/2 * costheta + b/2 * sintheta, y + a/2 * sintheta + b/2 * costheta)
-		draw.lines(screen, actual_color(blue), True, [p1, p2, p3, p4])
-		#drawLine((x,y),(x+a/2*costheta,y-a/2*sintheta))
+		draw.lines(screen, actual_color(getattr(geom, 'color', blue)), True, [p1, p2, p3, p4])
 	elif type(geom) is ode.GeomSphere:
 		x, y, _ = geom.getPosition()
 		r = geom.getRadius()
@@ -71,8 +70,8 @@ def drawGeom(geom):
 		costheta = rotmat[0]; sintheta = rotmat[1]
 		px, py = to_screen_pnt(x, y)
 		pr = to_screen_len(r)
-		draw.circle(screen, actual_color(blue), (int(px), int(py)), int(pr), 1)
-		drawLine((x,y), (x + costheta * r, y - sintheta * r))
+		draw.circle(screen, actual_color(getattr(geom, 'color', blue)), (int(px), int(py)), int(pr), 1)
+		drawLine((x,y), (x + costheta * r, y - sintheta * r), getattr(geom, 'color', blue))
 	elif type(geom) is ode.GeomCapsule:
 		x, y, _ = geom.getPosition()
 		pass

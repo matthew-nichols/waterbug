@@ -33,10 +33,44 @@ maze_space.isImmovable = True
 the_maze.make_geoms(maze_space)
 the_maze.make_geoms(maze_space, 0.1, (5,0))
 
+door_space = ode.HashSpace(objects.space)
+door_space.isImmovable = True
+doors = the_maze.make_doors(door_space, 0.1, (5,0))
+
+class wind_force(objects.Thing):
+	def __init__(self):
+		self.time = 0
+		objects.Thing.__init__(self)
+		
+	def update(self):
+		self.time += constants.dt
+		for g in objects.obj_list:
+			if hasattr(g, 'addForce'):
+				g.addForce((0, 0.1 * math.sin(0.05 * self.time)))
+				
+class destroy_doors(objects.Thing):
+	def __init__(self, _):
+		objects.Thing.__init__(self)
+	
+	def update(self):
+		self.destruct()
+	
+	def destroy(self):
+		global door_space
+		door_space = 0
+		wind_force()
+		
+	for_player = True
+
+key = Pickup.Pickup((2.5, 2.5), 5, destroy_doors)
+key.color = render.red
+
 ball_width = 0.05
 
 def near_callback(args, g1, g2):
 	try:
+		if getattr(g1, 'isImmovable', False) and getattr(g2, 'isImmovable', False):
+			return
 		if g1.isSpace() or g2.isSpace():
 			if g1.isSpace() and not getattr(g1, 'isImmovable', False):
 				g1.collide(args, near_callback)
@@ -87,8 +121,7 @@ ragdoll2 = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3+5, 0.5))
 objects.construct_now(ragdoll2)
 ragdoll2.addTorque(10)
 
-the_pickup = Pickup.Pickup((3.5, 3.5), 5, Pickup.XFactor)
-strength = Pickup.Pickup((2.5, 2.5), 5, Pickup.Strength)
+strength = Pickup.Pickup((3.5, 2.5), 5, Pickup.Strength)
 
 ragdoll.tag = 'player'
 ragdoll2.tag = 'player'
@@ -159,7 +192,8 @@ while running:
 	objects.update_obj_list()
 	for i in objects.obj_list:
 		i.draw()
-	
+	if door_space <> 0:
+		render.drawGeom(door_space)
 	display.flip()
 	
 	now_time = pygame.time.get_ticks() / 1000.0
