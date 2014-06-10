@@ -24,6 +24,10 @@ class MoreMass(objects.ODEThing):
 		self.jointgroup.empty()
 		del self.body
 		del self.fixed_joint
+		
+	def setPosition(self, pos):
+		x, y = pos
+		self.body.setPosition((x,y,0))
 	
 	def draw(self):
 		pass # because no geom
@@ -47,6 +51,12 @@ class Helper(objects.Ball):
 		self.is_strong = False
 		self.more.destruct()
 		del self.more
+	
+	def setPosition(self, pos):
+		x, y = pos
+		self.body.setPosition((x,y,0))
+		if hasattr(self, 'more'):
+			self.more.setPosition(pos)
 	
 	def update(self):
 		if self.is_strong:

@@ -16,6 +16,7 @@ screen = display.set_mode((2*WIDTH,HEIGHT))
 red = Color(255,0,0)
 green = Color(0,255,0)
 blue = Color(0,0,255)
+black = Color(0,0,0)
 
 invert_colors = False
 

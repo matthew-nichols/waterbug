@@ -251,5 +251,5 @@ class RagDoll(objects.Thing):
             ragdoll.wantedAngle8 = pi/2
             ragdoll.wantedAngle9 = -pi/2
     def addForce(self, force):
-        pass
+        self.segment10.addForce(force)
 

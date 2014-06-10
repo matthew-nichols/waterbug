@@ -6,11 +6,13 @@ import pygame.draw as draw
 import pygame.event as event
 import pygame.gfxdraw as gfxdraw
 import pygame.time
+import pygame.font as font
 from pygame import Color
 import ode
 import math
 import objgraph
 import datetime
+import weakref
 
 import render
 import maze
@@ -46,7 +48,12 @@ class wind_force(objects.Thing):
 		self.time += constants.dt
 		for g in objects.obj_list:
 			if hasattr(g, 'addForce'):
-				g.addForce((0, 0.1 * math.sin(0.05 * self.time)))
+				g.addForce((0, 0.1 * math.sin(0.15 * self.time)))
+	
+	def draw(self):
+		mag = math.sin(0.15 * self.time)
+		x, y = 4.5, 2.0
+		render.drawLine((x,y), (x,y + 2 * mag), render.red)
 				
 class destroy_doors(objects.Thing):
 	def __init__(self, _):
@@ -57,6 +64,7 @@ class destroy_doors(objects.Thing):
 	
 	def destroy(self):
 		global door_space
+		if door_space: objects.space.remove(door_space)
 		door_space = 0
 		wind_force()
 		
@@ -121,15 +129,84 @@ ragdoll2 = Ragdoll.RagDoll(objects.world, objects.space, 1, 0.3, (0.3+5, 0.5))
 objects.construct_now(ragdoll2)
 ragdoll2.addTorque(10)
 
-strength = Pickup.Pickup((3.5, 2.5), 5, Pickup.Strength)
+if not constants.jetpack_mode:
+	strength = Pickup.Pickup((3.5, 2.5), 5, Pickup.Strength)
 
 ragdoll.tag = 'player'
+ragdoll.player_num = 'Left Player'
 ragdoll2.tag = 'player'
+ragdoll2.player_num = 'Right Player'
 
-helper1 = Helper.Helper((0.5, 2.5))
-helper2 = Helper.Helper((5.5, 2.5))
-helper1.tag = 'helper'
-helper2.tag = 'helper'
+monospace = font.SysFont("monospace", 60)
+
+class Victory(objects.Thing):
+	def __init__(self, msg):
+		objects.Thing.__init__(self)
+		self.msg = msg
+	
+	def construct(self):
+		self.texture = monospace.render(self.msg + " wins!", False, render.red)
+		self.pos = (640 - self.texture.get_width() / 2, 320 - self.texture.get_height() / 2)
+	
+	def draw(self):
+		render.screen.blit(self.texture, self.pos)
+		
+class MoveObject(objects.Thing):
+	def __init__(self, obj, pos):
+		objects.Thing.__init__(self)
+		self.obj = obj
+		self.pos = pos
+	
+	def construct(self):
+		self.obj.setPosition(self.pos)
+		self.destruct()
+
+class VictoryDetection(objects.Thing):
+	def __init__(self):
+		objects.Thing.__init__(self)
+		self.done = False
+	
+	def construct(self):
+		self.geom = ode.GeomBox(objects.space, (20, 1, 1))
+		self.geom.setPosition((4.5, 4.7, 0))
+		self.geom.data = weakref.ref(self)
+	
+	def onCollision(self, other):
+		if getattr(other, 'tag', '') == 'player' and not self.done:
+			Victory(other.player_num)
+			self.done = True
+		if getattr(other, 'tag', '') == 'helper':
+			MoveObject(other, other.init_pos)
+
+VictoryDetection()
+
+class Jetpack(objects.Thing):
+	def __init__(self, obj):
+		self.obj = obj
+		objects.Thing.__init__(self)
+		self.dirs = [False, False, False, False]
+	
+	def update(self):
+		strength = 10.0
+		if self.dirs[0]:
+			self.obj.addForce((0,-strength))
+		if self.dirs[1]:
+			self.obj.addForce((-strength,0))
+		if self.dirs[2]:
+			self.obj.addForce((0,strength))
+		if self.dirs[3]:
+			self.obj.addForce((strength,0))
+
+if not constants.jetpack_mode:
+	helper1 = Helper.Helper((0.5, 2.5))
+	helper2 = Helper.Helper((5.5, 2.5))
+	helper1.tag = 'helper'
+	helper2.tag = 'helper'
+	helper1.init_pos = ((0.5, 0.5))
+	helper2.init_pos = ((5.5, 0.5))
+else:
+	helper1 = Jetpack(ragdoll)
+	helper2 = Jetpack(ragdoll2)
 
 running = True
 while running:

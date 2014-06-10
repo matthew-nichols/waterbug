@@ -23,7 +23,7 @@ class Strength(objects.Thing):
 	for_helper = True
 	def __init__(self, helper):
 		objects.Thing.__init__(self)
-		self.timeout = 5.0
+		self.timeout = 15.0
 		self.helper = helper
 		helper.become_stronger()
 	def update(self):
