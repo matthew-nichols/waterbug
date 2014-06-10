@@ -175,8 +175,9 @@ class VictoryDetection(objects.Thing):
 		if getattr(other, 'tag', '') == 'player' and not self.done:
 			Victory(other.player_num)
 			self.done = True
+			return False
 		if getattr(other, 'tag', '') == 'helper':
-			MoveObject(other, other.init_pos)
+			return True
 
 VictoryDetection()
 
